@@ -146,12 +146,22 @@
     "title": "Login to your account",
     "description": "Please enter your email and password to continue",
     "useGoogle": "Sign in With Google",
-    "useFacebook": "Sign in With Facebook"
+    "useFacebook": "Sign in With Facebook",
+    "button": "Login",
+    "paragraph": {
+      "left": "Don’t have an account?",
+      "right": "Create Account"
+    }
   },
   "signUpPage": {
     "title": "Create a new account",
     "description": "Please fill in your details to get started",
     "useGoogle": "Sign up With Google",
-    "useFacebook": "Sign up With Facebook"
+    "useFacebook": "Sign up With Facebook",
+    "button": "Create Account",
+    "paragraph": {
+      "left": "Have an account?",
+      "right": "Sign In"
+    }
   }
 }

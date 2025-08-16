@@ -30,7 +30,7 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4">
+    <div className="flex max-w-2xl w-full lg:w-2xl items-center justify-center min-h-screen px-4">
       <Card className="w-full max-w-md rounded-2xl !py-10 !px-8 shadow-lg">
         <h1 className="text-2xl text-center font-bold mb-2">{t("title")}</h1>
         <p className="mb-6 font-medium opacity-80 text-center">
@@ -80,14 +80,14 @@ function Login() {
               loading={loading}
               className="flex-1 rounded-lg"
             >
-              Login
+              {t("button")}
             </Button>
           </div>
 
           <div className="text-xs text-center pt-2">
-            <span className="opacity-65">Don’t have an account?</span>{" "}
+            <span className="opacity-65">{t("paragraph.left")}</span>{" "}
             <Link href={`/${locale}/signup`} className=" hover:underline">
-              Create Account
+              {t("paragraph.right")}
             </Link>
           </div>
         </Form>
