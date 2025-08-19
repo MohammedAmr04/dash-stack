@@ -6,6 +6,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import "@ant-design/v5-patch-for-react-19";
+import { cookies } from "next/headers";
 
 const nunitoSans = Nunito_Sans({
    variable: "--font-nunito-sans",
@@ -28,7 +29,7 @@ export default async function RootLayout({
    params: Promise<{ locale: string }>;
 }) {
    const { locale } = await params;
-
+   const cookieStore = cookies();
    if (!hasLocale(routing.locales, locale)) {
       notFound();
    }

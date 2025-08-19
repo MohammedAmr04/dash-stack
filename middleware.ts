@@ -7,10 +7,8 @@ import { updateSession } from "./libs/supabase/middleware";
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
-  // اول حاجة: نشغل i18n middleware
   const response = intlMiddleware(request);
 
-  // بعدين نمرر الـ request + response لـ updateSession
   return await updateSession(request, response);
 }
 

@@ -33,7 +33,6 @@ const FilesTablePage = () => {
   const [qrOpen, setQrOpen] = useState(false);
   const [qrRecord, setQrRecord] = useState<DataType | null>(null);
   const supabase = createClient();
-
   useEffect(() => {
     const fetchFiles = async () => {
       setLoading(true);
@@ -132,7 +131,7 @@ const FilesTablePage = () => {
         title: t("dateColumnTitle"),
         width: 120,
         dataIndex: "date",
-        render: (date) => dayjs(date).format("DD/MM/YYYY"), // 👈 هنا التنسيق
+        render: (date) => dayjs(date).format("DD/MM/YYYY"), 
         sorter: (a, b) =>
           new Date(a.date).getTime() - new Date(b.date).getTime(),
         sortDirections: ["descend", "ascend"],
@@ -191,9 +190,11 @@ const FilesTablePage = () => {
         >
           {t("addFileButtonTitle")}
         </Button>
+
       </div>
       <Table<DataType>
         columns={columns}
+        showSorterTooltip={{ target: "sorter-icon" }}
         dataSource={data}
         loading={loading}
         rowKey="id"
