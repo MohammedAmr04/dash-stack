@@ -24,10 +24,8 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({
    const pathname = usePathname();
    let pathAfterLocale = pathname.replace(/^\/[^/]+/, "");
    if (pathAfterLocale.split("/").length > 3) {
-      console.log(1);
       pathAfterLocale = pathAfterLocale.split("/").slice(1, 3).join("/");
    } else {
-      console.log(2);
       pathAfterLocale = pathAfterLocale.slice(1);
    }
 

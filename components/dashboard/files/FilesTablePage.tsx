@@ -1,6 +1,6 @@
 "use client";
-import React, { useMemo } from "react";
-import { Button, Input, Space, Table, Tooltip } from "antd";
+import React, { useMemo, useEffect, useState } from "react";
+import { Button, Input, Space, Table, Tag, Tooltip } from "antd";
 import type { TableColumnsType } from "antd";
 import type { ColumnFilterItem } from "antd/es/table/interface";
 import {
@@ -12,72 +12,96 @@ import {
 import { CopyIcon } from "@phosphor-icons/react/dist/ssr";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/libs/supabase/supabaseClient";
+import dayjs from "dayjs";
+import QrCodeModal from "./shared/QrCodeModal";
+import Link from "next/link";
 
 interface DataType {
-   key: React.Key;
+   id: string;
    name: string;
    description?: string;
    date: string;
-   tag: string;
+   short_url: string;
+   destination_url: string;
+   tag?: string;
+   tag_color?: string;
 }
-
-const data: DataType[] = [
-   {
-      key: "1",
-      name: "John Brown",
-      description: "Research document",
-      date: "2025-8-8",
-      tag: "Study",
-   },
-   {
-      key: "2",
-      name: "John Brown",
-      description: "Confidential report",
-      date: "2025-8-8",
-      tag: "Classified",
-   },
-   {
-      key: "3",
-      name: "John Brown",
-      description: "Priority materials",
-      date: "2024-8-8",
-      tag: "Important",
-   },
-   {
-      key: "4",
-      name: "Joe Black",
-      description: "Top secret files",
-      date: "2025-8-10",
-      tag: "Secret",
-   },
-   {
-      key: "5",
-      name: "Jim Red",
-      description: "Large dataset",
-      date: "2025-8-9",
-      tag: "Big",
-   },
-];
-
-const uniqueTags: ColumnFilterItem[] = Array.from(
-   new Set(data.map((item) => item.tag))
-).map((tag) => ({
-   text: tag,
-   value: tag,
-}));
 
 const FilesTablePage = () => {
    const t = useTranslations("dashboard.filesTable");
    const router = useRouter();
+   const [data, setData] = useState<DataType[]>([]);
+   const [loading, setLoading] = useState(true);
+   const [qrOpen, setQrOpen] = useState(false);
+   const [qrRecord, setQrRecord] = useState<DataType | null>(null);
+   const [copied, setCopied] = useState(false);
+   const supabase = createClient();
+   const fetchFiles = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+         .from("files")
+         .select(
+            "id, name,destination_url,short_url, description, created_at, tag, tag_color"
+         );
 
-   //TODO: memoize
+      if (error) {
+         console.error("Error fetching files:", error);
+      } else {
+         setData(
+            data.map((file) => ({
+               id: file.id,
+               name: file.name,
+               description: file.description,
+               short_url: file.short_url,
+               destination_url: file.destination_url,
+               date: file.created_at,
+               tag: file.tag,
+               tag_color: file.tag_color,
+            }))
+         );
+      }
+      setLoading(false);
+   };
+   useEffect(() => {
+      fetchFiles();
+   }, []);
+
+   const handleCopy = async (url: string) => {
+      try {
+         await navigator.clipboard.writeText(url);
+         setCopied(true);
+         setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+         console.error("Failed to copy: ", err);
+      }
+   };
+   // unique tags for filters
+   const uniqueTags: ColumnFilterItem[] = Array.from(
+      new Set(
+         data
+            .map((item) => item.tag)
+            .filter((tag) => tag !== undefined && tag !== null)
+      )
+   ).map((tag) => ({
+      text: tag,
+      value: tag,
+   }));
+
    const columns: TableColumnsType<DataType> = useMemo(() => {
       return [
          {
             title: t("nameColumnTitle"),
             dataIndex: "name",
             fixed: "left",
-            width: 150,
+            width: 250,
+            render: (_, record) => (
+               <Link
+                  href={`files/preview/${record.short_url}`}
+                  className="cursor-pointer !text-text">
+                  {record.name}
+               </Link>
+            ),
             filterDropdown: ({
                setSelectedKeys,
                selectedKeys,
@@ -119,17 +143,6 @@ const FilesTablePage = () => {
                   style={{ color: filtered ? 'var("--c-primary")' : undefined }}
                />
             ),
-            showSorterTooltip: {
-               title: (
-                  <div>
-                     <div>{t("nameFilterTooltip")}</div>
-                     <div
-                        style={{ fontSize: "12px", color: "var(--c-border)" }}>
-                        {t("filterTooltipHint")}
-                     </div>
-                  </div>
-               ),
-            },
             onFilter: (value, record) =>
                record.name
                   .toLowerCase()
@@ -145,17 +158,8 @@ const FilesTablePage = () => {
             title: t("dateColumnTitle"),
             width: 120,
             dataIndex: "date",
-            showSorterTooltip: {
-               title: (
-                  <div>
-                     <div>{t("dateFilterTooltip")}</div>
-                     <div
-                        style={{ fontSize: "12px", color: "var(--c-border)" }}>
-                        {t("filterTooltipHint")}
-                     </div>
-                  </div>
-               ),
-            },
+            render: (date) => dayjs(date).format("DD MMM 'YY"),
+
             sorter: (a, b) =>
                new Date(a.date).getTime() - new Date(b.date).getTime(),
             sortDirections: ["descend", "ascend"],
@@ -164,6 +168,15 @@ const FilesTablePage = () => {
             title: t("tagColumnTitle"),
             dataIndex: "tag",
             filters: uniqueTags,
+            render: (_, record) => {
+               return (
+                  <Tag
+                     color={record.tag_color}
+                     style={{ fontSize: "0.95rem", height: "1.5rem" }}>
+                     {record.tag}
+                  </Tag>
+               );
+            },
             onFilter: (value, record) =>
                value === "ALL" ? true : record.tag === value,
          },
@@ -176,37 +189,54 @@ const FilesTablePage = () => {
                   <Tooltip title={t("actionsTooltipQr")}>
                      <Button
                         type="text"
+                        onClick={() => {
+                           setQrRecord(record);
+                           setQrOpen(true);
+                        }}
                         icon={<QrCodeIcon size={19} />}
-                        //  onClick={() => handleView(record)}
                      />
                   </Tooltip>
-                  <Tooltip title={t("actionsTooltipCopy")}>
+                  <Tooltip title={copied ? "Copied!" : t("actionsTooltipCopy")}>
                      <Button
                         type="text"
                         icon={<CopyIcon size={19} />}
-                        //  onClick={() => handleEdit(record)}
+                        onClick={() => {
+                           handleCopy(record.destination_url);
+                        }}
                      />
                   </Tooltip>
                   <Tooltip title={t("actionsTooltipEdit")}>
                      <Button
                         type="text"
                         icon={<PencilIcon size={19} />}
-                        onClick={() => router.push("/dashboard/files/editfile")}
+                        onClick={() =>
+                           router.push(`/dashboard/files/${record.id}/editfile`)
+                        }
                      />
                   </Tooltip>
                   <Tooltip title={t("actionsTooltipDelete")}>
                      <Button
                         type="text"
                         icon={<TrashIcon size={19} />}
-                        //  onClick={() => handleDelete(record)}
                         danger
+                        onClick={async () => {
+                           const { error } = await supabase
+                              .from("files")
+                              .delete()
+                              .eq("id", record.id);
+                           fetchFiles();
+                           if (error) {
+                              console.error(error);
+                           }
+                        }}
                      />
                   </Tooltip>
                </div>
             ),
          },
       ];
-   }, [t, router]);
+   }, [t, router, uniqueTags]);
+
    return (
       <div className="overflow-x-auto">
          <div className="flex w-full justify-between">
@@ -219,12 +249,21 @@ const FilesTablePage = () => {
          </div>
          <Table<DataType>
             columns={columns}
-            dataSource={data}
             showSorterTooltip={{ target: "sorter-icon" }}
-            rowKey="key"
+            dataSource={data}
+            loading={loading}
+            rowKey="id"
             scroll={{ x: 1200 }}
             style={{ width: "100%" }}
          />
+         {qrRecord && (
+            <QrCodeModal
+               open={qrOpen}
+               onClose={() => setQrOpen(false)}
+               url={qrRecord.destination_url}
+               title={`QR Code for ${qrRecord.name}`}
+            />
+         )}
       </div>
    );
 };

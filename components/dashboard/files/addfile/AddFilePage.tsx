@@ -1,120 +1,12 @@
-"use client";
-import React, { useState } from "react";
-import { InboxOutlined } from "@ant-design/icons";
-import type { UploadProps } from "antd";
-import { Breadcrumb, Upload, notification } from "antd";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import React from "react";
+import { Breadcrumb, Form } from "antd";
 import Link from "next/link";
+import AddFileForm from "./AddFileForm";
 
-const { Dragger } = Upload;
-
-const AddFilePage: React.FC = () => {
-   const supabase = createClientComponentClient();
-   const [api, contextHolder] = notification.useNotification();
-   const [loading, setLoading] = useState(false);
-
-   const showError = (message: string, description?: string) => {
-      api.error({
-         message,
-         description,
-         placement: "topRight",
-         duration: 4.5,
-      });
-   };
-
-   const showSuccess = (message: string) => {
-      api.success({
-         message,
-         placement: "topRight",
-         duration: 3,
-      });
-   };
-
-   const customRequest: UploadProps["customRequest"] = async ({
-      file,
-      onSuccess,
-      onError,
-   }) => {
-      setLoading(true);
-      const uploadFile = file as File;
-
-      try {
-         const isLt10M = uploadFile.size / 1024 / 1024 < 10;
-         if (!isLt10M) {
-            throw new Error("File must be smaller than 10MB");
-         }
-
-         const isPdf = uploadFile.type === "application/pdf";
-         if (!isPdf) {
-            throw new Error("Only PDF files are allowed");
-         }
-
-         const fileExt = uploadFile.name.split(".").pop();
-         const fileName = `${Date.now()}-${Math.random()
-            .toString(36)
-            .substring(2, 8)}.${fileExt}`;
-         const filePath = `uploads/${fileName}`;
-
-         const { error } = await supabase.storage
-            .from("files")
-            .upload(filePath, uploadFile, {
-               contentType: uploadFile.type,
-            });
-
-         if (error) throw error;
-
-         const {
-            data: { publicUrl },
-         } = supabase.storage.from("files").getPublicUrl(filePath);
-
-         console.log("File uploaded successfully:", publicUrl);
-         showSuccess(`${uploadFile.name} uploaded successfully!`);
-         (file as any).url = publicUrl;
-         onSuccess?.("ok");
-      } catch (error) {
-         console.error("Upload error:", error);
-         const errorMsg =
-            error instanceof Error ? error.message : "Upload failed";
-         showError("Upload Failed", errorMsg);
-         onError?.(error as Error);
-      } finally {
-         setLoading(false);
-      }
-   };
-
-   const props: UploadProps = {
-      name: "file",
-      multiple: false,
-      customRequest,
-      accept: ".pdf",
-      disabled: loading,
-
-      showUploadList: {
-         showPreviewIcon: true,
-         showDownloadIcon: true,
-         showRemoveIcon: true,
-      },
-      onPreview: (file) => {
-         const url = file.url || file.response;
-         if (url) {
-            window.open(url, "_blank");
-         }
-      },
-      onChange(info) {
-         const { status } = info.file;
-         if (status === "done") {
-            console.log("Upload completed:", info.file.name);
-         }
-      },
-      onDrop(e) {
-         console.log("Dropped files", e.dataTransfer.files);
-      },
-   };
-
+const AddFilePage = async () => {
    return (
       <>
-         {contextHolder}
-         <div className="flex justify-between items-center flex-col w-full h-[40%]">
+         <div className="flex items-center flex-col w-full h-full gap-15">
             <div className="flex items-center gap-1 self-start w-full py-4 bg-foreground px-4 rounded-sm shadow-xs">
                <Breadcrumb
                   items={[
@@ -131,22 +23,10 @@ const AddFilePage: React.FC = () => {
                   ]}
                />
             </div>
-            <div className="flex justify-center items-center flex-col w-full h-[40%] p-4">
-               <Dragger
-                  {...props}
-                  className="p-8 w-full max-w-3xl bg-foreground rounded-xl shadow-sm">
-                  <p className="ant-upload-drag-icon text-primary">
-                     <InboxOutlined style={{ fontSize: "48px" }} />
-                  </p>
-                  <p className="ant-upload-text text-lg font-medium">
-                     {loading
-                        ? "Upload in progress..."
-                        : "Click or drag PDF to upload"}
-                  </p>
-                  <p className="ant-upload-hint text-text">
-                     Maximum file size: 10MB. Only PDF files accepted.
-                  </p>
-               </Dragger>
+            <div className="flex justify-center items-center flex-col w-[45%] h-[80%] p-4 border-border border-1 bg-foreground rounded-xl">
+               <div className="w-full flex items-center justify-center py-10 px-10">
+                  <AddFileForm></AddFileForm>
+               </div>
             </div>
          </div>
       </>

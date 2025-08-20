@@ -2,11 +2,13 @@
 import "@/app/[locale]/globals.css";
 import UiProvider from "@/services/context/UiProvider";
 import { Button } from "antd";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 async function NotFound({ params }: { params: Promise<{ locale: string }> }) {
-   const router = useRouter();
-   const { locale } = await params;
+   let locale = "en";
+   if (params) {
+      locale = (await params).locale;
+   }
 
    return (
       <UiProvider locale={locale}>
@@ -38,7 +40,7 @@ async function NotFound({ params }: { params: Promise<{ locale: string }> }) {
                         color="primary"
                         type="primary"
                         style={{ height: 50 }}
-                        onClick={() => router.push("/dashboard")}>
+                        onClick={() => redirect("/dashboard")}>
                         <div className="mx-30 my-4">Back to Dashboard</div>
                      </Button>
                   </div>

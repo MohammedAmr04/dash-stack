@@ -1,26 +1,15 @@
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
+import { type NextRequest } from "next/server";
+import { updateSession } from "./libs/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-export async function middleware(req: NextRequest) {
-   const res = intlMiddleware(req);
+export async function middleware(request: NextRequest) {
+   const response = intlMiddleware(request);
 
-   const supabase = createMiddlewareClient({ req, res });
-
-   const {
-      data: { user },
-   } = await supabase.auth.getUser();
-
-   if (!user && req.nextUrl.pathname.startsWith("/dashboard")) {
-      return NextResponse.redirect(new URL("/login", req.url));
-   }
-
-   return res;
+   return await updateSession(request, response);
 }
 
 export const config = {

@@ -1,5 +1,5 @@
 "use client";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/libs/supabase/supabaseClient";
 import Link from "next/link";
 // import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -20,7 +20,7 @@ function SidebarItem({
 }) {
    const fontColor = isActive ? "text-text-inverse" : "text-text";
    const router = useRouter();
-   const supabase = createClientComponentClient();
+   const supabase = createClient();
 
    //   const locale = useLocale();
    const handleLogout = async () => {
@@ -36,11 +36,11 @@ function SidebarItem({
       if (url === "dashboard/logout") {
          handleLogout();
       } else {
-         router.push(`/${url}`);
       }
    }
    return (
       <Link
+         onClick={() => handleClick()}
          href={url.startsWith("/") ? url : `/${url}`}
          className="w-full flex relative justify-start min-h-13 text-foreground px-6 cursor-pointer">
          {isActive && (
