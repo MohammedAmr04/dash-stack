@@ -96,7 +96,9 @@ const FilesTablePage = () => {
             fixed: "left",
             width: 250,
             render: (_, record) => (
-               <Link href={`files/preview/${record.short_url}`}>
+               <Link
+                  href={`files/preview/${record.short_url}`}
+                  className="cursor-pointer !text-text">
                   {record.name}
                </Link>
             ),

@@ -23,8 +23,8 @@ const AddFilePage = async () => {
                   ]}
                />
             </div>
-            <div className="flex justify-center items-center flex-col w-[45%] h-[75%] p-4 border-border border-1 bg-foreground rounded-xl">
-               <div className="w-full flex items-center justify-center py-5 px-10">
+            <div className="flex justify-center items-center flex-col w-[45%] h-[80%] p-4 border-border border-1 bg-foreground rounded-xl">
+               <div className="w-full flex items-center justify-center py-10 px-10">
                   <AddFileForm></AddFileForm>
                </div>
             </div>
