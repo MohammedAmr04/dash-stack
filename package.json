@@ -1,43 +1,44 @@
 {
-   "name": "dash-stack",
-   "version": "0.1.0",
-   "private": true,
-   "scripts": {
-      "dev": "next dev --turbopack",
-      "build": "next build",
-      "start": "next start",
-      "lint": "next lint"
-   },
-   "dependencies": {
-      "@ant-design/icons": "~5.6.1",
-      "@ant-design/nextjs-registry": "^1.1.0",
-      "@ant-design/v5-patch-for-react-19": "^1.0.3",
-      "@phosphor-icons/react": "^2.1.10",
-      "@supabase/ssr": "^0.6.1",
-      "@supabase/supabase-js": "^2.55.0",
-      "@swc/helpers": "^0.5.17",
-      "@tanstack/react-query": "^5.84.1",
-      "antd": "^5.26.7",
-      "axios": "^1.11.0",
-      "dayjs": "^1.11.13",
-      "lucide-react": "^0.536.0",
-      "next": "15.4.5",
-      "next-intl": "^4.3.4",
-      "react": "19.1.0",
-      "react-dom": "19.1.0",
-      "recharts": "^3.1.1"
-   },
-   "devDependencies": {
-      "@eslint/eslintrc": "^3",
-      "@tailwindcss/postcss": "^4",
-      "@types/node": "^20",
-      "@types/react": "^19",
-      "@types/react-dom": "^19",
-      "@typescript-eslint/eslint-plugin": "^8.39.1",
-      "@typescript-eslint/parser": "^8.39.1",
-      "eslint": "^9",
-      "eslint-config-next": "15.4.5",
-      "tailwindcss": "^4",
-      "typescript": "5.8.3"
-   }
+  "name": "dash-stack",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node init && next dev --turbopack",
+    "build": "node init && next build",
+    "start": "node init && next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ant-design/icons": "~5.6.1",
+    "@ant-design/nextjs-registry": "^1.1.0",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@pdf-viewer/react": "^1.8.2",
+    "@phosphor-icons/react": "^2.1.10",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.55.0",
+    "@swc/helpers": "^0.5.17",
+    "@tanstack/react-query": "^5.84.1",
+    "antd": "^5.26.7",
+    "axios": "^1.11.0",
+    "dayjs": "^1.11.13",
+    "lucide-react": "^0.536.0",
+    "next": "15.4.5",
+    "next-intl": "^4.3.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "recharts": "^3.1.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.5",
+    "tailwindcss": "^4",
+    "typescript": "5.8.3"
+  }
 }
